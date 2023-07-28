@@ -1,0 +1,26 @@
+.comicsItems {
+    margin-top: 50px;
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(4, 225px);
+        column-gap: 67px;
+        row-gap: 50px;
+    }
+    &__item {
+        cursor: pointer;
+        img {
+            width: 225px;
+        }
+    }
+    &__title {
+        font-family: Roboto Condensed;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    &__price {
+        color: rgba(0, 0, 0, 0.60);
+        font-family: Roboto Condensed;
+        font-size: 14px;
+        font-weight: 700;
+    }
+}
