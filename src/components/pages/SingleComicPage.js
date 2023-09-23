@@ -19,8 +19,7 @@ const SingleComicPage = () => {
 
 
 
-    const updateComic = () => {
-        
+    const updateComic = () => {   
         clearError();
         getComic(comicId)
             .then(onComicLoaded)

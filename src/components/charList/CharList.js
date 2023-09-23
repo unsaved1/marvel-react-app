@@ -80,7 +80,6 @@ const CharList = ({onCharSelected}) => {
     const spinner = loading && !newItemLoading ? <Spinner/> : null;
     const content = setAllChars(chars);
 
-
     return (
         <div className="char__list">
             {spinner}
