@@ -10,6 +10,24 @@ import comicsItemImg from '../../resources/img/UW.png';
 import './comicsItems.scss';
 import { Link } from 'react-router-dom';
 
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>;
+            break;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>;
+            break;
+        case 'confirmed': 
+            return <Component/>;
+            break;
+        case 'error':
+            return <ErrorMessage/>;
+            break;
+        default:
+            throw new Error('Unexpected process state');
+    }
+};
 
 
 const ComicsItems = () => {
@@ -18,7 +36,7 @@ const ComicsItems = () => {
     const [offset, setOffset]                 = useState(1544);
     const [comicsEnded, setComicsEnded]       = useState(false);
 
-    const {loading, error, getAllComics}      = useMarvelService();
+    const {loading, error, getAllComics, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         onRequest(offset, true);
@@ -28,6 +46,7 @@ const ComicsItems = () => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true)
         getAllComics(offset)
             .then(onComicsListLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onComicsListLoaded = (newComics) => {
@@ -59,22 +78,15 @@ const ComicsItems = () => {
                 )
             });
 
-            return [...comicsArr];
+            return (<ul className="comicsItems__grid" style={+window.innerWidth <= 576 ? {width: window.innerWidth - +'20'}: {width: 'auto'}}>
+                        {[...comicsArr]}
+                    </ul>)
         }
     }
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
-    const content = setAllComics(comics);
-
-
     return (
         <div className="comicsItems">
-            {spinner}
-            {errorMessage}
-            <ul className="comicsItems__grid" style={+window.innerWidth <= 576 ? {width: window.innerWidth - +'20'}: {width: 'auto'}}>
-                {content}
-            </ul>
+            {setContent(process, () => setAllComics(comics), newItemLoading)} 
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading} 

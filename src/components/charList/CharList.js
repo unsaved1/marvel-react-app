@@ -1,12 +1,34 @@
 import {useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import './charList.scss';
 
-import CharImage from '../charImage/CharImage';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import useMarvelService from '../../services/MarvelService';
+
+import CharImage from '../charImage/CharImage';
+
+import './charList.scss';
+
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>;
+            break;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>;
+            break;
+        case 'confirmed': 
+            return <Component/>;
+            break;
+        case 'error':
+            return <ErrorMessage/>;
+            break;
+        default:
+            throw new Error('Unexpected process state');
+    }
+};
+
 
 const CharList = ({onCharSelected}) => {
     const [chars, setChars]                   = useState([]);
@@ -14,7 +36,7 @@ const CharList = ({onCharSelected}) => {
     const [offset, setOffset]                 = useState(1544);
     const [charEnded, setCharEnded]           = useState(false);
 
-    const {loading, error, getAllCharacters}  = useMarvelService();
+    const {loading, error, getAllCharacters, process, setProcess}  = useMarvelService();
 
     useEffect(() => {
         onRequest(offset, true);
@@ -24,6 +46,7 @@ const CharList = ({onCharSelected}) => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true) 
         getAllCharacters(offset)
             .then(onCharListLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const onCharListLoaded = (newChars) => {
@@ -72,21 +95,17 @@ const CharList = ({onCharSelected}) => {
                 )
             });
 
-            return [...charsArr];
+            return (
+                <ul className="char__grid" style={+window.innerWidth <= 576 ? {width: window.innerWidth - +'20'}: {width: 'unset'}}>
+                    {[...charsArr]}
+                </ul>
+            );
         }
     }
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
-    const content = setAllChars(chars);
-
     return (
         <div className="char__list">
-            {spinner}
-            {errorMessage}
-            <ul className="char__grid" style={+window.innerWidth <= 576 ? {width: window.innerWidth - +'20'}: {width: '300px'}}>
-                {content}
-            </ul>
+            {setContent(process, () => setAllChars(chars), newItemLoading)} 
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}

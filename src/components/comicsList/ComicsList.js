@@ -3,6 +3,25 @@ import uw from '../../resources/img/UW.png';
 import xMen from '../../resources/img/x-men.png';
 import {Link} from 'react-router-dom';
 
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>;
+            break;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>;
+            break;
+        case 'confirmed': 
+            return <Component/>;
+            break;
+        case 'error':
+            return <ErrorMessage/>;
+            break;
+        default:
+            throw new Error('Unexpected process state');
+    }
+};
+
 const ComicsList = () => {
     return (
         <div className="comics__list">
